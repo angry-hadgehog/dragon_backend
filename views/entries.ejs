@@ -1,11 +1,5 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title><%= title %></title>
-  <link rel='stylesheet' href='/stylesheets/style.css' />
-</head>
-<body>
-<% include menu %>
+<% include header.ejs %>
+<% include menu.ejs %>
 <% entries.forEach((entry) => { %>
 <div class='entry'>
   <h3><%= entry.title %></h3>
@@ -13,5 +7,4 @@
   <p>Posted by <%= entry.username %></p>
 </div>
 <% }) %>
-</body>
-</html>
+<% include footer.ejs %>

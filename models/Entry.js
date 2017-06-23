@@ -39,4 +39,4 @@ class Entry {
 
 }
 
-
+module.exports = Entry;
