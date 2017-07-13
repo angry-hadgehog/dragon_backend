@@ -5,11 +5,16 @@ const logger         = require('morgan');
 const cookieParser   = require('cookie-parser');
 const bodyParser     = require('body-parser');
 const sassMiddleware = require('node-sass-middleware');
+const session        = require('express-session');
 const validate       = require('./middleware/validate');
+const messages       = require('./middleware/messages');
+const user           = require('./middleware/user');
 
-const index   = require('./routes/index');
-const users   = require('./routes/users');
-const entries = require('./routes/entries');
+const login    = require('./routes/login');
+const entries  = require('./routes/entries');
+const register = require('./routes/register');
+
+const api = require('./routes/api');
 
 const app = express();
 
@@ -24,6 +29,10 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
+app.use(session({
+                    secret: 'secret',
+                    resave: false, saveUninitialized: true
+                }));
 app.use(sassMiddleware({
                            src:            path.join(__dirname, 'public'),
                            dest:           path.join(__dirname, 'public'),
@@ -32,15 +41,25 @@ app.use(sassMiddleware({
                        }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use('/api', api.auth);
+app.use(user);
+app.use(messages);
+
 app.get('/', entries.list);
 app.get('/post', entries.form);
 app.post('/post',
          validate.required('entry[title]'),
          validate.lengthAbove('entry[title]', 4),
          entries.submit);
+app.get('/register', register.form);
+app.post('/register', register.submit);
+app.get('/login', login.form);
+app.post('/login', login.submit);
+app.get('/logout', login.logout);
 
-app.use('/', index);
-app.use('/users', users);
+app.get('/api/user/:id', api.user);
+app.get('/api/entries/:page?', api.entries);
+app.post('/api/entry', api.add);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

@@ -18,8 +18,8 @@ exports.required = (field) => {
         if (getField(req, field)) {
             next();
         } else {
+            res.error(`${field.join(' ')} is required`);
             res.redirect('back');
-            res.send(`${field.join(' ')} is required`);
         }
     }
 };
@@ -31,8 +31,8 @@ exports.lengthAbove = (field, len) => {
             next();
         } else {
             const fields = field.join(' ');
+            res.error(`${fields} must have more than ${len} characters`);
             res.redirect('back');
-            res.send(`${fields} must have more than ${len} characters`);
         }
     }
 };
